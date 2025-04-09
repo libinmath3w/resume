@@ -9,6 +9,13 @@ import "./share.css";
 import { Analytics } from "@vercel/analytics/react";
 import Link from "next/link";
 
+// Extend Window interface to include our custom property
+declare global {
+  interface Window {
+    updateContentTimeout?: NodeJS.Timeout;
+  }
+}
+
 // Client component that safely uses useSearchParams inside
 function ShareContent() {
   const [content, setContent] = useState("");
@@ -56,17 +63,58 @@ function ShareContent() {
           const data = await response.json();
           // Only update if content is different to avoid cursor jumping
           if (data.content !== contentRef.current) {
-            setContent(data.content);
-            contentRef.current = data.content;
+            // Store current cursor position
+            if (document.activeElement instanceof HTMLTextAreaElement && 
+                document.activeElement.className === "editor-area") {
+              const textarea = document.activeElement;
+              const cursorPos = textarea.selectionStart;
+              
+              // Update content
+              setContent(data.content);
+              contentRef.current = data.content;
+              
+              // Restore cursor position after React updates the DOM
+              setTimeout(() => {
+                if (document.activeElement === textarea) {
+                  textarea.selectionStart = cursorPos;
+                  textarea.selectionEnd = cursorPos;
+                }
+              }, 0);
+            } else {
+              // No active textarea, just update content
+              setContent(data.content);
+              contentRef.current = data.content;
+            }
           }
-          setConnectionStatus("connected");
+          // Only change connection status to connected if currently disconnected
+          // This prevents flickering when updating content
+          if (connectionStatus !== "connected") {
+            setConnectionStatus("connected");
+          }
         } else {
-          setConnectionStatus("disconnected");
-          setError("Failed to get updates");
+          // Don't immediately disconnect on a single error
+          console.error("Failed to get updates, will retry");
+          
+          // Only show disconnect after multiple failures
+          if (connectionStatus === "errorWarning") {
+            setConnectionStatus("disconnected");
+            setError("Failed to get updates");
+          } else if (connectionStatus === "connected") {
+            // Set to warning state but don't show disconnected yet
+            setConnectionStatus("errorWarning");
+          }
         }
       } catch (error) {
-        setConnectionStatus("disconnected");
-        setError("Failed to connect to server");
+        console.error("Error in polling:", error);
+        
+        // Only show disconnect after multiple failures
+        if (connectionStatus === "errorWarning") {
+          setConnectionStatus("disconnected");
+          setError("Failed to connect to server");
+        } else if (connectionStatus === "connected") {
+          // Set to warning state but don't show disconnected yet
+          setConnectionStatus("errorWarning");
+        }
       }
     }, 1000);
   };
@@ -238,33 +286,46 @@ function ShareContent() {
     }
   };
 
-  // Handle content changes
+  // Handle content changes with improved error handling and debouncing
   const handleContentChange = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newContent = e.target.value;
     setContent(newContent);
     contentRef.current = newContent;
 
-    // Send the update to the server
+    // Save updated content to localStorage immediately
     if (sessionId) {
-      try {
-        await fetch("/api/share", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            action: "update",
-            sessionId,
-            content: newContent,
-          }),
-        });
-        
-        // Save updated content to localStorage
-        saveSessionToLocalStorage(sessionId, newContent);
-        
-      } catch (error) {
-        console.error("Failed to update content:", error);
+      saveSessionToLocalStorage(sessionId, newContent);
+    }
+
+    // Debounced update to the server to prevent frequent API calls while typing
+    if (sessionId) {
+      // Use debouncing to prevent too many API calls while typing quickly
+      if (window.updateContentTimeout) {
+        clearTimeout(window.updateContentTimeout);
       }
+      
+      window.updateContentTimeout = setTimeout(async () => {
+        try {
+          const response = await fetch("/api/share", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              action: "update",
+              sessionId,
+              content: newContent,
+            }),
+          });
+          
+          if (!response.ok) {
+            console.error("Failed to update content, status:", response.status);
+          }
+        } catch (error) {
+          console.error("Failed to update content:", error);
+          // Don't change connection status here - let the polling handle connection status
+        }
+      }, 300); // Wait 300ms after typing stops before sending update
     }
   };
 

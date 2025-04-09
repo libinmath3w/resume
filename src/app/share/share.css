@@ -64,6 +64,11 @@
   background-color: #F44336;
 }
 
+.errorWarning {
+  background-color: #FF9800;
+  animation: pulse 1.5s infinite;
+}
+
 .connecting {
   background-color: #FFC107;
   animation: pulse 1.5s infinite;
