@@ -71,6 +71,63 @@ function ShareContent() {
     }, 1000);
   };
 
+  // Add a heartbeat function to keep the session alive
+  const startHeartbeat = (id: string) => {
+    const heartbeatInterval = setInterval(async () => {
+      try {
+        await fetch("/api/share", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            action: "heartbeat",
+            sessionId: id,
+          }),
+        });
+      } catch (error) {
+        console.error("Heartbeat failed:", error);
+      }
+    }, 30000); // Send heartbeat every 30 seconds
+
+    return heartbeatInterval;
+  };
+
+  // Add a ref for the heartbeat interval
+  const heartbeatIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Store session data in localStorage
+  const saveSessionToLocalStorage = (id: string, textContent: string) => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("codeshare_session", JSON.stringify({
+        sessionId: id,
+        content: textContent,
+        timestamp: Date.now()
+      }));
+    }
+  };
+
+  // Load session from localStorage
+  const loadSessionFromLocalStorage = () => {
+    if (typeof window !== "undefined") {
+      const savedSession = localStorage.getItem("codeshare_session");
+      if (savedSession) {
+        try {
+          const session = JSON.parse(savedSession);
+          // Only use saved session if it's less than 24 hours old
+          if (Date.now() - session.timestamp < 24 * 60 * 60 * 1000) {
+            return session;
+          } else {
+            localStorage.removeItem("codeshare_session");
+          }
+        } catch (e) {
+          localStorage.removeItem("codeshare_session");
+        }
+      }
+    }
+    return null;
+  };
+
   // Function to create a new sharing session
   const createNewSession = async () => {
     setIsLoading(true);
@@ -95,11 +152,21 @@ function ShareContent() {
         setContent("");
         contentRef.current = "";
         
+        // Save to localStorage
+        saveSessionToLocalStorage(data.sessionId, "");
+        
         // Update URL with the session ID
         router.push(`/share?session=${data.sessionId}`);
         
         // Start polling for updates
         startPolling(data.sessionId);
+        
+        // Start heartbeat
+        if (heartbeatIntervalRef.current) {
+          clearInterval(heartbeatIntervalRef.current);
+        }
+        heartbeatIntervalRef.current = startHeartbeat(data.sessionId);
+        
         setConnectionStatus("connected");
       } else {
         setError("Failed to create session");
@@ -142,11 +209,21 @@ function ShareContent() {
         setContent(data.content);
         contentRef.current = data.content;
         
+        // Save to localStorage
+        saveSessionToLocalStorage(id, data.content);
+        
         // Update URL with the session ID
         router.push(`/share?session=${id}`);
         
         // Start polling for updates
         startPolling(id);
+        
+        // Start heartbeat
+        if (heartbeatIntervalRef.current) {
+          clearInterval(heartbeatIntervalRef.current);
+        }
+        heartbeatIntervalRef.current = startHeartbeat(id);
+        
         setConnectionStatus("connected");
         setShowJoinInput(false);
       } else {
@@ -181,6 +258,10 @@ function ShareContent() {
             content: newContent,
           }),
         });
+        
+        // Save updated content to localStorage
+        saveSessionToLocalStorage(sessionId, newContent);
+        
       } catch (error) {
         console.error("Failed to update content:", error);
       }
@@ -210,17 +291,28 @@ function ShareContent() {
     }
   };
 
-  // Check for session ID in URL when component mounts
+  // In the component's useEffect, add code to check localStorage for a saved session
   useEffect(() => {
+    // First check URL param
     const sessionParam = searchParams.get("session");
     if (sessionParam) {
       joinSession(sessionParam);
+      return;
+    }
+    
+    // If no URL param, check localStorage
+    const savedSession = loadSessionFromLocalStorage();
+    if (savedSession && savedSession.sessionId) {
+      joinSession(savedSession.sessionId);
     }
 
     return () => {
-      // Clean up polling interval when component unmounts
+      // Clean up all intervals when component unmounts
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
+      }
+      if (heartbeatIntervalRef.current) {
+        clearInterval(heartbeatIntervalRef.current);
       }
     };
   }, [searchParams]);
