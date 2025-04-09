@@ -1,14 +1,16 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import ScrollToTop from "../../components/ScrollToTop";
 import "./share.css";
 import { Analytics } from "@vercel/analytics/react";
+import Link from "next/link";
 
-export default function SharePage() {
+// Client component that safely uses useSearchParams inside
+function ShareContent() {
   const [content, setContent] = useState("");
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -221,7 +223,7 @@ export default function SharePage() {
         clearInterval(pollingIntervalRef.current);
       }
     };
-  }, []);
+  }, [searchParams]);
 
   // Add ESC key handler to exit fullscreen mode
   useEffect(() => {
@@ -482,5 +484,18 @@ export default function SharePage() {
         }
       `}</style>
     </main>
+  );
+}
+
+// Main page component that uses Suspense to handle async operations
+export default function SharePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
+    }>
+      <ShareContent />
+    </Suspense>
   );
 } 
