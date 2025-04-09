@@ -59,6 +59,11 @@ const Header = () => {
           <a href="#skills" className="text-foreground hover:text-primary transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Skills</a>
           <a href="#education" className="text-foreground hover:text-primary transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Education</a>
           <a href="#projects" className="text-foreground hover:text-primary transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Projects</a>
+          <Link href="/infinite" className="text-foreground hover:text-primary transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Infinite</Link>
+          <Link href="/share" className="text-foreground hover:text-primary transition-colors flex items-center gap-1" onClick={() => setIsMobileMenuOpen(false)}>
+            <span>CodeShare</span>
+            <span className="text-xs bg-indigo-600 text-white px-1.5 py-0.5 rounded-full">New</span>
+          </Link>
         </div>
         
         {/* Desktop Navigation */}
@@ -73,6 +78,19 @@ const Header = () => {
                 {item}
               </a>
             ))}
+            <Link 
+              href="/infinite" 
+              className="px-4 py-2 rounded-full text-foreground hover:text-primary hover:bg-gray-light/50 transition-all focus-ring"
+            >
+              Infinite
+            </Link>
+            <Link 
+              href="/share" 
+              className="px-4 py-2 rounded-full text-foreground hover:text-primary hover:bg-gray-light/50 transition-all focus-ring flex items-center gap-1"
+            >
+              <span>CodeShare</span>
+              <span className="text-xs bg-indigo-600 text-white px-1.5 py-0.5 rounded-full">New</span>
+            </Link>
           </nav>
         </div>
       </div>

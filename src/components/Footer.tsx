@@ -26,7 +26,9 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row justify-between items-center gap-10 pb-12 border-b border-gray/30">
             <div className="max-w-md">
               <div className="flex items-center gap-3 mb-4">
-                <h2 className="text-2xl font-bold text-gradient">Libin Mathew</h2>
+                <h2 className="text-2xl font-bold text-gradient">
+                  Libin Mathew
+                </h2>
                 <div className="h-6 w-px bg-gray mx-1"></div>
                 <span className="text-gray-dark text-sm">
                   Senior Software Engineer
@@ -96,6 +98,17 @@ const Footer = () => {
                       className="hover:text-primary transition-colors focus-ring"
                     >
                       Infinite
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/share"
+                      className="hover:text-primary transition-colors focus-ring flex items-center gap-1"
+                    >
+                      <span>CodeShare</span>
+                      <span className="text-xs bg-indigo-600 text-white px-1.5 py-0.5 rounded-full">
+                        New
+                      </span>
                     </Link>
                   </li>
                 </ul>
@@ -202,14 +215,17 @@ const Footer = () => {
               Built with ❤️ by Next.js and Tailwind CSS
             </p>
             <p className="mt-2 text-xs opacity-70">
-              Version 1.0.1 Build 20250331
+              Version 1.0.2 Build 20250409
             </p>
           </div>
         </div>
       </footer>
 
       {/* Resume Modal */}
-      <ResumeModal isOpen={isResumeModalOpen} onClose={() => setIsResumeModalOpen(false)} />
+      <ResumeModal
+        isOpen={isResumeModalOpen}
+        onClose={() => setIsResumeModalOpen(false)}
+      />
     </>
   );
 };
