@@ -365,7 +365,7 @@ export default function PlaylistPage() {
               {/* QR Code Modal */}
               {showQRCode && playlistId && (
                 <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm">
-                  <div className="dark:bg-gray-800 bg-white rounded-xl p-5 max-w-sm w-full mx-4 shadow-2xl border border-indigo-500/20">
+                  <div className="bg-background rounded-xl p-5 max-w-sm w-full mx-4 shadow-2xl border border-indigo-500/20">
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="text-lg font-semibold text-foreground">Share Playlist</h3>
                       <button
