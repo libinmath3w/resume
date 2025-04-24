@@ -212,8 +212,10 @@ export default function PlaylistPage() {
               isFullscreen ? "opacity-0 absolute -z-50" : "opacity-100"
             }`}
           >
-            <h1 className="text-4xl md:text-5xl font-bold mb-3 text-gradient-pink">
-              YouTube Playlist Player
+            <h1 className="text-4xl md:text-5xl font-bold mb-3">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600 dark:from-indigo-400 dark:to-purple-500">
+                YouTube Playlist Player
+              </span>
             </h1>
             <p className="text-lg text-foreground max-w-2xl mx-auto">
               Play YouTube playlists without ads or interruptions.
@@ -688,13 +690,14 @@ export default function PlaylistPage() {
         .text-gradient-pink {
           background: linear-gradient(
             to right,
-            var(--color-primary),
-            var(--color-secondary)
+            var(--color-primary, #6366f1),
+            var(--color-secondary, #9333ea)
           );
           -webkit-background-clip: text;
           background-clip: text;
           color: transparent;
           display: inline-block;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
       `}</style>
       <Analytics />
