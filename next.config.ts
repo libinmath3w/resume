@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   transpilePackages: ['three'],
+  turbopack: {},
   webpack: (config) => {
     // Add support for importing shader files
     config.module.rules.push({
@@ -46,13 +47,6 @@ const nextConfig: NextConfig = {
         ],
       }
     ];
-  },
-  // Increase the bodyParser size limit for the API route
-  api: {
-    bodyParser: {
-      sizeLimit: '10mb',
-    },
-    responseLimit: '10mb',
   },
   // Add CORS and rewrites for specific embedded content
   async rewrites() {

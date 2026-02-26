@@ -199,7 +199,7 @@ const Skills = () => {
   ];
 
   // Animation variants for Framer Motion
-  const containerVariants = {
+  const containerVariants: any = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -209,7 +209,7 @@ const Skills = () => {
     }
   };
   
-  const itemVariants = {
+  const itemVariants: any = {
     hidden: { y: 20, opacity: 0 },
     visible: {
       y: 0,
@@ -222,7 +222,7 @@ const Skills = () => {
     }
   };
   
-  const tagVariants = {
+  const tagVariants: any = {
     hidden: { scale: 0.8, opacity: 0 },
     visible: {
       scale: 1,
@@ -235,7 +235,7 @@ const Skills = () => {
     }
   };
   
-  const skillItemVariants = {
+  const skillItemVariants: any = {
     initial: { 
       x: 0, 
       opacity: 1 

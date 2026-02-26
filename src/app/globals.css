@@ -1,9 +1,7 @@
 /* Import animations */
 @import "./animations.css";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 :root {
   --background: #ffffff;
@@ -84,11 +82,25 @@ body {
   }
 
   .section-transition {
-    @apply relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-16 after:bg-gradient-to-t after:from-background after:to-transparent after:opacity-80;
+    position: relative;
+  }
+
+  .section-transition::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4rem;
+    background-image: linear-gradient(to top, var(--background), transparent);
+    opacity: 0.8;
   }
 
   .card {
-    @apply bg-gray-light p-6 rounded-xl shadow-lg border border-gray border-opacity-40 transition-all duration-300 backdrop-blur-sm bg-opacity-80;
+    @apply p-6 rounded-xl transition-all duration-300 backdrop-blur-sm;
+    background-color: var(--gray-light);
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--gray);
   }
 
   .card-hover {
@@ -96,7 +108,9 @@ body {
   }
   
   .card-animated {
-    @apply relative z-10 bg-gray-light border-transparent;
+    @apply relative z-10;
+    background-color: var(--gray-light);
+    border-color: transparent;
   }
   
   .card-animated::before {
@@ -127,7 +141,9 @@ body {
   }
 
   .glass-effect {
-    @apply backdrop-blur-md bg-opacity-30 border border-gray border-opacity-20;
+    @apply backdrop-blur-md;
+    background-color: color-mix(in srgb, var(--background) 70%, transparent);
+    border: 1px solid var(--gray);
   }
 
   .btn {
@@ -135,11 +151,24 @@ body {
   }
 
   .btn-primary {
-    @apply bg-primary text-white hover:bg-primary-dark hover:shadow-lg hover:shadow-primary hover:shadow-opacity-20;
+    @apply text-white;
+    background-color: var(--primary);
+  }
+
+  .btn-primary:hover {
+    background-color: var(--primary-dark);
+    box-shadow: var(--card-shadow-hover);
   }
 
   .btn-outline {
-    @apply border border-gray hover:bg-gray-light text-foreground hover:shadow-lg hover:shadow-gray hover:shadow-opacity-20;
+    @apply border;
+    border-color: var(--gray);
+    color: var(--foreground);
+  }
+
+  .btn-outline:hover {
+    background-color: var(--gray-light);
+    box-shadow: var(--card-shadow-hover);
   }
 
   .btn-icon {
@@ -147,7 +176,9 @@ body {
   }
 
   .badge {
-    @apply inline-block px-3 py-1 text-xs font-semibold rounded-full bg-gray bg-opacity-60 text-foreground backdrop-blur-sm;
+    @apply inline-block px-3 py-1 text-xs font-semibold rounded-full backdrop-blur-sm;
+    background-color: color-mix(in srgb, var(--gray) 60%, transparent);
+    color: var(--foreground);
   }
 
   .heading-xl {
@@ -167,14 +198,25 @@ body {
   }
 
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary;
+    background-image: linear-gradient(to right, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
   
   .text-gradient-pink {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-secondary to-accent;
+    background-image: linear-gradient(to right, var(--secondary), var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
   
   .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 focus:ring-offset-2 focus:ring-offset-background;
+    @apply focus:outline-none;
+  }
+
+  .focus-ring:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--primary) 50%, transparent);
+    outline-offset: 2px;
   }
 }
