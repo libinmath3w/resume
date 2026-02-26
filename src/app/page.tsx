@@ -26,6 +26,13 @@ import {
   Sparkles,
   Share2,
   Code,
+  Server,
+  Cloud,
+  Database,
+  Network,
+  SlidersHorizontal,
+  ShieldCheck,
+  Activity,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -89,6 +96,21 @@ const SKILLS: Record<string, string[]> = {
   'CI/CD': ['Jenkins', 'GitHub Actions', 'GitLab CI', 'Bamboo', 'ArgoCD', 'Azure DevOps'],
   Security: ['HashiCorp Vault', 'EJBCA', 'Certbot', 'ACM', 'OAuth2', 'JWT'],
   Databases: ['MySQL', 'PostgreSQL', 'DynamoDB', 'MongoDB', 'CosmosDB'],
+};
+
+const SKILL_CATEGORY_ICONS: Record<string, LucideIcon> = {
+  Languages: Code2,
+  Backend: Server,
+  Architecture: Activity,
+  AWS: Cloud,
+  Azure: Cloud,
+  Streaming: Network,
+  IaC: Layers,
+  Containers: Server,
+  Monitoring: Activity,
+  'CI/CD': SlidersHorizontal,
+  Security: ShieldCheck,
+  Databases: Database,
 };
 
 const EXPERIENCES = [
@@ -589,34 +611,50 @@ export default function Home() {
             </ScrollSection>
 
             {/* Technical Skills */}
-            <ScrollSection id="skills" className="space-y-3 scroll-mt-6">
+            <ScrollSection id="skills" className="space-y-4 scroll-mt-6">
               <SectionHeading icon={Code2}>Technical Skills</SectionHeading>
 
-              {/* Filter tabs */}
-              <div className="flex flex-wrap gap-1.5 pb-1">
-                <button
-                  onClick={() => setActiveSkillFilter(null)}
-                  className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${
-                    activeSkillFilter === null
-                      ? 'border border-emerald-500/40 bg-emerald-500/15 text-emerald-300'
-                      : 'border border-slate-700 text-slate-400 hover:border-slate-600 hover:text-slate-200'
-                  }`}
-                >
-                  All
-                </button>
-                {Object.keys(SKILLS).map((cat) => (
+              {/* Filter bar */}
+              <div className="flex flex-col gap-1.5 rounded-2xl border border-slate-800 bg-slate-900/70 p-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                    <SlidersHorizontal className="h-3 w-3" />
+                    <span>Filter by area</span>
+                    {activeSkillFilter && (
+                      <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-300">
+                        Active: {activeSkillFilter}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-[10px] text-slate-600">
+                    {Object.values(filteredSkills).reduce((acc, arr) => acc + arr.length, 0)} skills visible
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-1.5 pt-0.5">
                   <button
-                    key={cat}
-                    onClick={() => setActiveSkillFilter(activeSkillFilter === cat ? null : cat)}
+                    onClick={() => setActiveSkillFilter(null)}
                     className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${
-                      activeSkillFilter === cat
+                      activeSkillFilter === null
                         ? 'border border-emerald-500/40 bg-emerald-500/15 text-emerald-300'
                         : 'border border-slate-700 text-slate-400 hover:border-slate-600 hover:text-slate-200'
                     }`}
                   >
-                    {cat}
+                    All
                   </button>
-                ))}
+                  {Object.keys(SKILLS).map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setActiveSkillFilter(activeSkillFilter === cat ? null : cat)}
+                      className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${
+                        activeSkillFilter === cat
+                          ? 'border border-emerald-500/40 bg-emerald-500/15 text-emerald-300'
+                          : 'border border-slate-700 text-slate-400 hover:border-slate-600 hover:text-slate-200'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <AnimatePresence mode="wait">
@@ -626,28 +664,41 @@ export default function Home() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
-                  className="grid gap-3 sm:grid-cols-2"
+                  className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
                 >
-                  {Object.entries(filteredSkills).map(([category, skills]) => (
-                    <div
-                      key={category}
-                      className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 transition-colors hover:border-slate-700"
-                    >
-                      <p className="mb-2.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                        {category}
-                      </p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {skills.map((skill) => (
-                          <span
-                            key={skill}
-                            className="cursor-default rounded-md border border-slate-700/60 bg-slate-800/60 px-2 py-0.5 text-xs text-slate-300 transition-all hover:border-emerald-500/40 hover:bg-emerald-500/5 hover:text-emerald-200"
-                          >
-                            {skill}
+                  {Object.entries(filteredSkills).map(([category, skills]) => {
+                    const CatIcon = SKILL_CATEGORY_ICONS[category] ?? Code2;
+                    return (
+                      <div
+                        key={category}
+                        className="group rounded-2xl border border-slate-800 bg-slate-900/60 p-4 transition-all hover:border-emerald-500/40 hover:bg-slate-900"
+                      >
+                        <div className="mb-2.5 flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-700 bg-slate-900/80 text-slate-400 transition-colors group-hover:border-emerald-500/40 group-hover:bg-emerald-500/10 group-hover:text-emerald-300">
+                              <CatIcon className="h-3.5 w-3.5" />
+                            </span>
+                            <p className="text-xs font-semibold uppercase tracking-wide text-slate-200">
+                              {category}
+                            </p>
+                          </div>
+                          <span className="rounded-full bg-slate-900/90 px-2 py-0.5 text-[10px] text-slate-500">
+                            {skills.length} skills
                           </span>
-                        ))}
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {skills.map((skill) => (
+                            <span
+                              key={skill}
+                              className="cursor-default rounded-md border border-slate-700/60 bg-slate-800/60 px-2 py-0.5 text-xs text-slate-300 transition-all hover:border-emerald-500/40 hover:bg-emerald-500/5 hover:text-emerald-200"
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </motion.div>
               </AnimatePresence>
             </ScrollSection>
