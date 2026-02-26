@@ -116,7 +116,7 @@ const SKILL_CATEGORY_ICONS: Record<string, LucideIcon> = {
 const EXPERIENCES = [
   {
     title: 'Technical Lead',
-    company: 'SKOVVY INFORMATION TECHNOLOGY LLC',
+    company: 'Opsole Ltd',
     period: 'Oct 2025 – Present',
     current: true,
     bullets: [
